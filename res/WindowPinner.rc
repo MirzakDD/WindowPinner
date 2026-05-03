@@ -1,0 +1,4 @@
+#include "Resource.h"
+
+// First icon resource becomes the exe icon in Explorer.
+IDI_APP_ICON ICON "pin.ico"
