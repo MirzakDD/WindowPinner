@@ -46,4 +46,5 @@ public:
 
     void SetTooltip(PCWSTR text);
     void HandleNotify(WPARAM /*wparam*/, LPARAM lparam);
+    void Reinstall();
 };

@@ -1,4 +1,3 @@
-// Tray.cpp
 #include "Tray.hpp"
 #include "UniqueHandle.hpp"
 
@@ -71,6 +70,20 @@ void Tray::SetTooltip(PCWSTR text)
 
     wcsncpy_s(mNid.szTip, text, _TRUNCATE);
     Shell_NotifyIconW(NIM_MODIFY, &mNid);
+}
+
+void Tray::Reinstall()
+{
+    if (!mActive)
+        return;
+
+    Shell_NotifyIconW(NIM_DELETE, &mNid);
+
+    if (!Shell_NotifyIconW(NIM_ADD, &mNid))
+        return;
+
+    mNid.uVersion = NOTIFYICON_VERSION_4;
+    Shell_NotifyIconW(NIM_SETVERSION, &mNid);
 }
 
 void Tray::HandleNotify(WPARAM /*wparam*/, LPARAM lparam)

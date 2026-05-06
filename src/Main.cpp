@@ -21,6 +21,7 @@ namespace
     constexpr PCWSTR kMsgWindowClassName = L"WindowPinnerMsg";
 
     UniqueWindowClass sMsgWc;
+    const UINT sTaskbarCreatedMsg = RegisterWindowMessageW(L"TaskbarCreated");
 
     PCWSTR FormatTrayTooltip()
     {
@@ -61,6 +62,12 @@ namespace
 
     LRESULT CALLBACK MsgWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
+        if (msg == sTaskbarCreatedMsg && sTaskbarCreatedMsg != 0)
+        {
+            gApp.tray.Reinstall();
+            return 0;
+        }
+
         switch (msg)
         {
             case WM_HOTKEY:
@@ -115,7 +122,10 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE /*prev*/, LPWSTR /*cmdLine*/, 
         }
     );
 
-    gApp.msgHwnd.Reset(CreateWindowExW(0, kMsgWindowClassName, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, instance, nullptr));
+    gApp.msgHwnd.Reset(CreateWindowExW(WS_EX_TOOLWINDOW, kMsgWindowClassName, L"", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, instance, nullptr));
+
+    if (sTaskbarCreatedMsg != 0)
+        ChangeWindowMessageFilterEx(gApp.msgHwnd.Get(), sTaskbarCreatedMsg, MSGFLT_ALLOW, nullptr);
 
     gApp.hotkey = Hotkey(gApp.msgHwnd.Get());
     gApp.tray = Tray(
